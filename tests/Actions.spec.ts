@@ -7,7 +7,7 @@ test('textbox', async({page}) => {
     await page.locator('[id="password"]').press('Enter');
 
     await page.close();
-})
+});
 
 
 test('click', async({page}) => {
@@ -22,7 +22,7 @@ test('click', async({page}) => {
     await expect(page.locator('[id="click_type"]')).toHaveText('Right-Click');
 
     await page.close();
-})
+});
 
 
 test('radio', async({page}) => {
@@ -32,7 +32,7 @@ test('radio', async({page}) => {
     await page.locator('[id="radioId"]').check();
     await expect(page.locator('[id="radioId"]')).toBeChecked();
 
-})
+});
 
 
 test('checkbox', async({page}) => {
@@ -42,7 +42,7 @@ test('checkbox', async({page}) => {
     await page.locator('(//*[@type="checkbox"])[1]').check();
     await expect(page.locator('(//*[@type="checkbox"])[1]').isChecked).toBeTruthy();
 
-})
+});
 
 test('dropdown', async({page}) => {
     await page.goto('https://the-internet.herokuapp.com/dropdown');
@@ -58,7 +58,7 @@ test('dropdown', async({page}) => {
         index:2
     })
     await page.pause();
-})
+});
 
 
 test('multiselect', async({page}) => {
@@ -69,7 +69,7 @@ test('multiselect', async({page}) => {
         {value:"Florida"}
     ])
     await page.pause();
-})
+});
 
 
 test('dynamic', async({page}) => {
@@ -77,7 +77,7 @@ test('dynamic', async({page}) => {
     await page.locator('[role="combobox"]').click();
     await page.locator('//li[text()="India"]').click();
     await page.pause();
-})
+});
 
 
 test('alert', async({page}) => {
@@ -90,7 +90,7 @@ test('alert', async({page}) => {
 
     })
     await page.locator('[onclick="jsAlert()"]').click();
-})
+});
 
 
 test('Confirmation ok', async({page}) => {
@@ -103,7 +103,7 @@ test('Confirmation ok', async({page}) => {
 
     })
     await page.locator('[onclick="jsConfirm()"]').click();
-})
+});
 
 
 test('cancel', async({page}) => {
@@ -116,7 +116,7 @@ test('cancel', async({page}) => {
 
     })
     await page.locator('[onclick="jsConfirm()"]').click();
-})
+});
 
 
 test.only('promptalertok', async({page}) => {
@@ -129,7 +129,7 @@ test.only('promptalertok', async({page}) => {
 
     })
     await page.locator('[onclick="jsPrompt()"]').click();
-})
+});
 
 test.only('cancelpromptalert', async({page}) => {
     await page.goto('https://the-internet.herokuapp.com/javascript_alerts');
@@ -141,5 +141,116 @@ test.only('cancelpromptalert', async({page}) => {
 
     })
     await page.locator('[onclick="jsPrompt()"]').click();
-})
+});
 
+
+test('frames', async({page}) => {
+    await page.goto('https://the-internet.herokuapp.com/nested_frames');
+    let framesCount = page.frames().length;
+    console.log(`The frames count is ${framesCount}`);
+    let bottomFrame = page.frameLocator('[src="/frame_bottom"]').locator('//body[contains(text(),"BOTTOM")]');
+    await expect(bottomFrame).toHaveText('BOTTOM');
+    let topFrame = page.frame('frame-top');
+    let topFrameChilds = topFrame?.childFrames();
+    let middleFrame = topFrameChilds[1];
+    await expect(middleFrame.locator('[id="content"]')).toHaveText('MIDDLE');
+});
+
+
+test('tabs', async({page}) => {
+    await page.goto('https://the-internet.herokuapp.com/windows');
+
+    const [browserTabs] = await Promise.all([
+        page.waitForEvent('popup'), await page.locator('[href="/windows/new"]').click()
+    ])
+
+    await browserTabs.waitForLoadState();
+    const pages = browserTabs.context().pages();
+    const defaultTab = pages[0];
+    await expect(defaultTab.locator('//h3')).toContainText('Opening a new window');
+    const latestTab = pages[pages.length-1];
+    await expect(latestTab.locator('//h3')).toContainText('New Window');
+    
+    defaultTab.close();
+    latestTab.close();
+    
+});
+
+
+
+test('windows', async({page}) => {
+    await page.goto('https://demo.automationtesting.in/Windows.html');
+    await page.locator('[href="#Seperate"]').click();
+
+    const [newTab] = await Promise.all([
+        page.context().waitForEvent('page'), await page.locator('[onclick="newwindow()"]').click()
+    ])
+
+    await newTab.waitForLoadState();
+    await newTab.locator('[href="/downloads"]').click();
+    await expect(newTab.locator('[class="d-1"]')).toContainText('Downloads');
+
+    await page.locator('[href="Index.html"]').click();
+    await expect(page.locator('[id="btn1"]')).toHaveText('Sign In');
+
+    await page.close();
+    await newTab.close();
+    
+});
+
+
+test('dragAndDrop', async({page}) => {
+    await page.goto('https://the-internet.herokuapp.com/drag_and_drop');
+    const boxA = page.locator('[id="column-a"]');
+    const boxB = page.locator('[id="column-b"]');
+    
+    await boxA.hover();
+    await page.mouse.down();
+    await boxB.hover();
+    await page.mouse.up();
+
+    await page.waitForTimeout(2000);
+
+    await boxB.dragTo(boxA);
+    await page.waitForTimeout(2000);
+    
+    page.close();
+});
+
+
+test('download', async({page}) => {
+    await page.goto('https://the-internet.herokuapp.com/download');
+
+    const download = await Promise.all(
+        [
+            page.waitForEvent('download'), await page.locator('[href="download/random_data.txt"]').click()
+        ]
+    )
+
+    const downloadFile = download[0];
+    const downloadFilePath = await downloadFile.path();
+    const downloadedFileName = await downloadFile.suggestedFilename();
+    // await downloadFile.saveAs(downloadedFileName);
+    await downloadFile.saveAs("Mahmoud");
+    console.log(`the downloaded file path is ${downloadFilePath}`);
+
+    page.close();
+});
+
+
+
+test('upload', async({page}) => {
+    await page.goto('https://the-internet.herokuapp.com/upload');
+
+    const fileUpload = await Promise.all(
+        [
+            page.waitForEvent('filechooser'), await page.locator('[id="file-upload"]').click()
+        ]
+    )
+    await fileUpload[0].setFiles('./random_data.txt');
+    await page.locator('[id="file-submit"]').click();
+    await page.waitForTimeout(2000);
+
+
+    page.close();
+});
