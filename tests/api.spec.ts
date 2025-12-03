@@ -1,8 +1,14 @@
-import { expect , test} from '@playwright/test';
+import { expect, test } from '@playwright/test';
 
-test('get api', async({request})=>{
+let objectID = null;
+let fullPathWithId: string;
+const baseURL = "https://api.restful-api.dev/";
+const objectPath ='objects';
+const fullUrlWithObjectPath = baseURL + objectPath;
+
+test('get api', async ({ request }) => {
     const startingTime = Date.now();
-    const response = await request.get("https://api.restful-api.dev/objects");
+    const response = await request.get(fullUrlWithObjectPath);
     let responseBody = await response.json();
     let responseHeader = response.headers();
     console.log(responseBody);
@@ -16,3 +22,75 @@ test('get api', async({request})=>{
     console.log(responseTime);
     expect(responseTime).toBeLessThan(2000);
 });
+
+
+test('post api', async ({ request }) => {
+    const payload = {
+        "name": "Apple MacBook Pro 16",
+        "data": {
+            "year": 2019,
+            "price": 1849.99,
+            "CPU model": "Intel Core i9",
+            "Hard disk size": "1 TB"
+        }
+    }
+    const response = await request.post(fullUrlWithObjectPath, {
+        data: payload
+    })
+    let responseBody = await response.json();
+    console.log(responseBody);
+    expect(response.status()).toBe(200);
+    expect(responseBody.name).toContain(payload.name);
+    objectID = responseBody.id;
+    fullPathWithId = fullUrlWithObjectPath+'/'+objectID;
+})
+
+
+test('put api', async ({ request }) => {
+    const payload = {
+        "name": "Apple MacBook Pro 11",
+        "data": {
+            "year": 2019,
+            "price": 1849.99,
+            "CPU model": "Intel Core i9",
+            "Hard disk size": "1 TB"
+        }
+    }
+    const response = await request.put(fullPathWithId, {
+        data: payload
+    })
+    let responseBody = await response.json();
+    console.log(responseBody);
+    expect(response.status()).toBe(200);
+    expect(responseBody.name).toContain(payload.name);
+
+    let objectID = responseBody.id;
+})
+
+
+test('patch api', async ({ request }) => {
+    const payload = {
+        "name": "Apple MacBook Air M4"
+    }
+    const response = await request.patch(fullPathWithId, {
+        data: payload
+    })
+    let responseBody = await response.json();
+    console.log(responseBody);
+    expect(response.status()).toBe(200);
+    expect(responseBody.name).toContain(payload.name);
+
+    let objectID = responseBody.id;
+})
+
+
+
+test('delete api', async ({ request }) => {
+    const response = await request.delete(fullPathWithId)
+    let responseBody = await response.json();
+    console.log(responseBody);
+    expect(response.status()).toBe(200);
+    expect(responseBody.message).toContain('Object with');
+
+    let objectID = responseBody.id;
+})
