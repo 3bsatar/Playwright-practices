@@ -1,10 +1,28 @@
 import { expect, test } from "../fixtures/fixture";
 import LoginPage from "./pages/loginPage/loginPage";
 import ProductPage from "./pages/productPage/productPage";
-import * as testData from "./testData/testData.json"
+import * as testData from "./testData/testData.json";
+import type { Page } from "@playwright/test";
 
-test('E2E',async({page,loginPage,productPage})=> {
+let page: Page;
+let loginPage: LoginPage;
+let productPage: ProductPage;
+test.describe('suite 1',()=>{
+    test.beforeEach(async ({ browser }) => {
+    page = await browser.newPage();   
+    loginPage = new LoginPage(page);
+    productPage = new ProductPage(page);
+
     await page.goto('https://www.saucedemo.com/');
+});
+
+
+test.afterEach(async()=>{
+    await page.close();
+})
+
+
+test('E2E',async({})=> {
     await loginPage.enterUsername(testData.username);
     await loginPage.enterPassword(testData.password);
     await loginPage.takeScreenshot('./tests/screenshots/loginPage.png');
@@ -13,5 +31,9 @@ test('E2E',async({page,loginPage,productPage})=> {
     await productPage.takeScreenshot('./tests/screenshots/productPage.png');
     await productPage.clickOnCartBtn();
     await productPage.takeScreenshot('./tests/screenshots/cartPage.png');
-    page.close();
+})
+})
+
+test('outside suite',async({})=>{
+    console.log('outside the suite');
 })
