@@ -13,4 +13,8 @@ export default class BasePage {
     protected async enterTextToElement(element: Locator, text: string) {
         await element.fill(text);
     }
+
+    public async takeScreenshot(filePath: string){
+        await this.page.screenshot({path: filePath});
+    }
 }

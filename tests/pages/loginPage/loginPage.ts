@@ -5,11 +5,11 @@ export default class LoginPage extends BasePage {
     private readonly password = this.page.locator('[id="password"]');
     private readonly loginBtn = this.page.locator('[id="login-button"]');
 
-    async enterUsername(){
-        await this.enterTextToElement(this.username,"standard_user");
+    async enterUsername(username:string){
+        await this.enterTextToElement(this.username,username);
     }
-    async enterPassword(){
-        await this.enterTextToElement(this.password,"secret_sauce");
+    async enterPassword(password:string){
+        await this.enterTextToElement(this.password,password);
     }
     async clickOnLoginButton(){
         await this.clickOnElement(this.loginBtn);
