@@ -34,7 +34,7 @@ export default defineConfig({
     screenshot: 'only-on-failure',
     video: 'retain-on-failure'
   },
-
+  grep:[new RegExp('@smoke')],
   /* Configure projects for major browsers */
   projects: [
     {
