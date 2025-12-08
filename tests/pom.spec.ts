@@ -34,14 +34,14 @@ test('E2E',async({})=> {
 })
 })
 
-test('outside suite @sanity',async({})=>{
-    console.log('outside the suite sanity');
-})
+// test('outside suite @sanity',async({})=>{
+//     console.log('outside the suite sanity');
+// })
 
-test('outside suite @smoke',async({})=>{
-    console.log('outside the suite smoke');
-})
+// test('outside suite @smoke',async({})=>{
+//     console.log('outside the suite smoke');
+// })
 
-test('outside suite2 @smoke',async({})=>{
-    console.log('outside the suite smoke again');
-})
+// test('outside suite2 @smoke',async({})=>{
+//     console.log('outside the suite smoke again');
+// })
