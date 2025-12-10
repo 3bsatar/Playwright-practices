@@ -1,0 +1,2 @@
+"DESCRIPTION","DURATION IN MS","NAME","PARENT SUITE","START TIME","STATUS","STOP TIME","SUB SUITE","SUITE","TEST CLASS","TEST METHOD"
+"","904","E2E","chromium","Wed Dec 10 14:18:34 UTC 2025","passed","Wed Dec 10 14:18:35 UTC 2025","suite 1","pom.spec.ts","",""
